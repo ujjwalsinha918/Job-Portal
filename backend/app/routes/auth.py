@@ -1,35 +1,35 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from app.schemas.user import UserCreate, UserLogin
-from app.services import auth_service
-from app.core.database import get_db
+from fastapi import APIRouter, Depends, Request
+from authlib.integrations.starlette_client import OAuth
+from starlette.responses import RedirectResponse
+from app.core import config
 
 # Create a router object for authentication-related routes
-router = APIRouter(prefix="/auth", tags=["Auth"])
+router = APIRouter()
+# Initializes the Authlib OAuth object
+oauth=OAuth()
 
-# Register Route
-@router.post("/register")
-def register(user:UserCreate, db: Session = Depends(get_db)):
-    """
-    Handles new user registration.
-    - Validates incoming request using UserCreate schema.
-    - Calls the service layer to register a new user.
-    - Returns a success message with the user's email.
-    """
-    new_user = auth_service.register_user(user, db)
-    return {"message": "User registered successfully", "user": new_user.email}
+# Registers the "google" OAuth client with Authlib
+oauth.register(
+    name="google",
+    client_id=config.GOOGLE_CLIENT_ID,
+    client_secret=config.GOOGLE_CLIENT_SECRET,
+    # Google's discovery document URL to fetch provider details automatically
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    # Defines the user data your app requests (email, profile info)
+    client_kwargs={"scope": "openid email profile"}
+)
 
-#Login Route
-@router.post("login")
-def login(user:UserLogin, db:Session = Depends(get_db)):
-    """
-    Handles user login.
-    - Validates incoming request using UserLogin schema.
-    - Calls the service layer to check credentials.
-    - If valid, returns JWT token + user role.
-    - If invalid, raises HTTP 401 Unauthorized.
-    """
-    token, role = auth_service.login_user(db, user)
-    if not token:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    return {"access_token": token, "token_type": "bearer", "role": role}
+# Define the endpoint for initiating the Google login process.
+@router.get("/login/google")
+async def login_via_google(request: Request):
+    redirect_uri = config.GOOGLE_REDIRECT_URL
+    return await oauth.google.authorize_redirect(request, redirect_uri)
+
+@router.get("/auth/google/callback")
+async def auth_google_callback(request: Request):
+    # authorize_access_token() exchanges that code for an access token + ID token.
+    token = await oauth.google.authorize_access_token(request)
+    # parse_id_token() extracts user information from the ID token.
+    user_info = await oauth.google.parse_id_token(request, token)
+    return {"user":user_info}
+

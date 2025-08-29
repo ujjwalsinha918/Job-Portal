@@ -6,7 +6,7 @@ import { mockUser } from "./mockAuth";
 // Import all page components
 import Landing from "./pages/Public/Landing";
 import Login from "./pages/Auth/Login";
-
+import Unauthorized from "./pages/Auth/Unauthorized";
 import Register from "./pages/Auth/Register";
 import JobListings from "./pages/Public/JobListings";   // ✅ fixed: should be plural (JobListings)
 import JobDetails from "./pages/Public/JobDetails";
