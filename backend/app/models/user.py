@@ -1,4 +1,15 @@
-from sqlalchemy import relationship
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+from app.core.database import Base
+
+class User(Base):
+    __tablename__ = "users"  # sql model for user's table
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    email = Column(String(100), nullable=False, unique=True)
+    role = Column(String(50), nullable=False)
+    hashed_password = Column(String(100), nullable=False)
 
 # This line establishes a one-to-many relationship.
 # It means a single User (an employer) can have multiple Job posts.
