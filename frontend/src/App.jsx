@@ -1,7 +1,6 @@
 // Import core routing components from react-router-dom
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { mockUser } from "./mockAuth";
 
 // Import all page components
 import Landing from "./pages/Public/Landing";
@@ -50,7 +49,7 @@ function App() {
         <Route 
           path="/jobseeker/*"
           element={
-            <ProtectedRoute role="jobseeker" user={mockUser}>
+            <ProtectedRoute role="jobseeker">
               <JobSeekerDashboard />
             </ProtectedRoute>
           }
@@ -64,7 +63,7 @@ function App() {
         <Route
           path="/employer/*"
           element={
-            <ProtectedRoute role="employer" user={mockUser}>
+            <ProtectedRoute role="employer">
               <EmployerDashboard />
             </ProtectedRoute>
           }
@@ -72,7 +71,7 @@ function App() {
         <Route
           path="/admin/*"
           element={
-            <ProtectedRoute role="admin" user={mockUser}>
+            <ProtectedRoute role="admin">
               <AdminDashboard />
             </ProtectedRoute>
           }
