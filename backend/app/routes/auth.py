@@ -42,7 +42,10 @@ async def auth_google_callback(request: Request, db: Session = Depends(get_db)):
         user_info = await oauth.google.parse_id_token(request, token)
     except Exception as e:
         raise HTTPException(status_code=400, detail="Google authentication failed")
+    
 
+
+    # for login 
     # 1) Lookup user in DB by email
     email = user_info.get("email")
     if not email:
@@ -57,7 +60,7 @@ async def auth_google_callback(request: Request, db: Session = Depends(get_db)):
         user_in = user_schemas.UserCreate(
             email=email,
             name=user_info.get("name", ""),
-            password=hash_password(random_password)
+            password=random_password
         )
         user = user_crud.create_user(db, user_in, role="jobseeker")
 

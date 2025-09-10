@@ -12,3 +12,4 @@ export const getCurrentUser = async () => {
         return null;
     }
 };
+// checks if the user is logged in and fetches the logged-in user's details from the backend using the saved JWT token
