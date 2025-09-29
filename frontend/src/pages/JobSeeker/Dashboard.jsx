@@ -1,17 +1,15 @@
 import { Routes, Route } from "react-router-dom";
 import DashboardNavbar from "../../components/Navbar";
-import SidebarMenu from "../../components/SidebarMenu";
-
-function Profile() {
-  return <h2 className="text-xl font-bold">My Profile</h2>;
-}
-function AppliedJobs() {
-  return <h2 className="text-xl font-bold">Applied Jobs</h2>;
-}
+import SidebarMenu from "../../components/ModernSidebar";
+import JobListing from "./JobListing";
+import Profile from "./Profile";
+import AppliedJobs from "./AppliedJobs";
+import ProtectedRoute from "../../components/ProtectedRoute"; // <-- import it
 
 export default function JobSeekerDashboard() {
   const jobSeekerMenu = [
     { label: "Profile", path: "/jobseeker/profile" },
+    { label: "Browse Jobs", path: "/jobseeker/jobs" },
     { label: "Applied Jobs", path: "/jobseeker/applied-jobs" },
     {
       label: "Charts",
@@ -29,8 +27,30 @@ export default function JobSeekerDashboard() {
         <SidebarMenu items={jobSeekerMenu} />
         <main className="flex-1 p-6 overflow-y-auto">
           <Routes>
-            <Route path="profile" element={<Profile />} />
-            <Route path="applied-jobs" element={<AppliedJobs />} />
+            <Route
+              path="profile"
+              element={
+                <ProtectedRoute role="jobseeker">
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="applied-jobs"
+              element={
+                <ProtectedRoute role="jobseeker">
+                  <AppliedJobs />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="jobs"
+              element={
+                <ProtectedRoute role="jobseeker">
+                  <JobListing />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
       </div>

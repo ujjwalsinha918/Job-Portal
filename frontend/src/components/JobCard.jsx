@@ -1,7 +1,7 @@
 // JobCard.jsx
 // ✅ Reusable component that displays a single job card with title, company, location, description, and "View Details" button.
 
-export default function JobCard({ job, onView }) {
+export default function JobCard({ job, onView, onApply }) {
   return (
     <div className="bg-white shadow rounded-lg p-4 flex flex-col gap-2">
       {/* Job Title */}
@@ -22,6 +22,12 @@ export default function JobCard({ job, onView }) {
       >
         View Details
       </button>
+      <button
+          onClick={() => onApply(job.id)}
+          className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600"
+        >
+          Apply
+        </button>
     </div>
   );
 }

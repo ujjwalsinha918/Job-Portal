@@ -16,3 +16,10 @@ class UserResponse(UserBase):
 
     class Config:
         orm_mode = True # allows SQLAlchemy objects → Pydantic
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class RoleUpdate(BaseModel):
+    role: str    

@@ -9,15 +9,15 @@ class User(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(100), nullable=False, unique=True)
     role = Column(String(50), nullable=False)
-    hashed_password = Column(String(100), nullable=False)
+    hashed_password = Column(String(255), nullable=False)
 
-# This line establishes a one-to-many relationship.
-# It means a single User (an employer) can have multiple Job posts.
-#`jobs` is a new attribute on the User object. When accessed, it will return a list
-# of all `Job` objects associated with this user.
-jobs = relationship("Job", back_populates="user")
+    # This line establishes a one-to-many relationship.
+    # It means a single User (an employer) can have multiple Job posts.
+    #`jobs` is a new attribute on the User object. When accessed, it will return a list
+    # of all `Job` objects associated with this user.
+    jobs = relationship("Job", back_populates="employer")
 
-# It means a single User (a job seeker) can submit multiple `Application`s.
-# `applications` is a new attribute on the User object that will return a list
-# of all `Application` objects submitted by this user.
-applications = relationship("Application", back_populates="jobSeeker")
+    # It means a single User (a job seeker) can submit multiple `Application`s.
+    # `applications` is a new attribute on the User object that will return a list
+    # of all `Application` objects submitted by this user.
+    applications = relationship("Application", back_populates="jobSeeker")

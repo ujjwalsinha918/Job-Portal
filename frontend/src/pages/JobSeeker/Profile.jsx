@@ -1,7 +1,7 @@
 import { useState } from "react";
+import ProtectedRoute from "../../components/ProtectedRoute"; // <-- wrap in ProtectedRoute
 
-export default function Profile() {
-  // Dummy state (later fetch this from backend API)
+function ProfileContent() {
   const [profile, setProfile] = useState({
     name: "Ujjwal Sinha",
     email: "ujjwal@example.com",
@@ -37,7 +37,7 @@ export default function Profile() {
           type="email"
           name="email"
           value={profile.email}
-          disabled // usually email is not editable
+          disabled
           className="w-full border p-2 rounded mb-4"
         />
 
@@ -57,5 +57,13 @@ export default function Profile() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function Profile() {
+  return (
+    <ProtectedRoute role="jobseeker">
+      <ProfileContent />
+    </ProtectedRoute>
   );
 }

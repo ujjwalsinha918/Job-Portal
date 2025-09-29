@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from app.models.job import JobStatus
 
 class JobBase(BaseModel):
     title: str
@@ -11,6 +12,7 @@ class JobCreate(JobBase):
 class JobOut(JobBase):
     id: int # Job
     employer_id: int # and it's creator
+    status: JobStatus
 
     class Config:
         orm_mode = True

@@ -1,7 +1,7 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import { GoogleLogin } from "@react-oauth/google";
+import { AiOutlineUser, AiOutlineMail, AiOutlineLock, AiOutlineTeam, AiOutlineGoogle } from "react-icons/ai";
 
 export default function Register() {
   const validationSchema = Yup.object({
@@ -13,7 +13,7 @@ export default function Register() {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const res = await axios.post("http://localhost:8000/auth/register", values);
+      await axios.post("http://localhost:8000/auth/register", values);
       alert("Registration successful!");
       resetForm();
     } catch (err) {
@@ -23,22 +23,8 @@ export default function Register() {
     }
   };
 
-  // Handle Google signup
-  const handleGoogleSignup = async (credentialResponse) => {
-    try {
-      const res = await axios.post("http://localhost:8000/auth/google", {
-        token: credentialResponse.credential,
-      });
-
-      localStorage.setItem("token", res.data.access_token);
-      localStorage.setItem("role", res.data.role);
-
-      alert("Google signup successful!");
-      window.location.href = "/dashboard";
-    } catch (err) {
-      console.error("Google signup failed", err);
-      alert("Google signup failed");
-    }
+  const handleGoogleSignup = () => {
+    window.location.href = "http://localhost:8000/auth/login/google";
   };
 
   return (
@@ -52,45 +38,76 @@ export default function Register() {
           onSubmit={handleSubmit}
         >
           <Form className="space-y-4">
-            <div>
-              <label className="block mb-1 font-medium">Name</label>
-              <Field name="name" type="text" className="w-full border p-2 rounded" />
-              <ErrorMessage name="name" component="div" className="text-red-500 text-sm" />
+            {/* Name */}
+            <div className="relative">
+              <AiOutlineUser className="absolute top-3 left-3 text-gray-400" />
+              <Field
+                name="name"
+                type="text"
+                placeholder="Name"
+                className="w-full border p-2 pl-10 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <ErrorMessage name="name" component="div" className="text-red-500 text-sm mt-1" />
             </div>
 
-            <div>
-              <label className="block mb-1 font-medium">Email</label>
-              <Field name="email" type="email" className="w-full border p-2 rounded" />
-              <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
+            {/* Email */}
+            <div className="relative">
+              <AiOutlineMail className="absolute top-3 left-3 text-gray-400" />
+              <Field
+                name="email"
+                type="email"
+                placeholder="Email"
+                className="w-full border p-2 pl-10 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
             </div>
 
-            <div>
-              <label className="block mb-1 font-medium">Password</label>
-              <Field name="password" type="password" className="w-full border p-2 rounded" />
-              <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
+            {/* Password */}
+            <div className="relative">
+              <AiOutlineLock className="absolute top-3 left-3 text-gray-400" />
+              <Field
+                name="password"
+                type="password"
+                placeholder="Password"
+                className="w-full border p-2 pl-10 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <ErrorMessage name="password" component="div" className="text-red-500 text-sm mt-1" />
             </div>
 
-            <div>
-              <label className="block mb-1 font-medium">Role</label>
-              <Field as="select" name="role" className="w-full border p-2 rounded">
+            {/* Role */}
+            <div className="relative">
+              <AiOutlineTeam className="absolute top-3 left-3 text-gray-400" />
+              <Field
+                as="select"
+                name="role"
+                className="w-full border p-2 pl-10 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
                 <option value="jobseeker">Job Seeker</option>
                 <option value="employer">Employer</option>
                 <option value="admin">Admin</option>
               </Field>
-              <ErrorMessage name="role" component="div" className="text-red-500 text-sm" />
+              <ErrorMessage name="role" component="div" className="text-red-500 text-sm mt-1" />
             </div>
 
-            <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+            {/* Submit */}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-colors"
+            >
               Register
             </button>
           </Form>
         </Formik>
 
-        <div className="mt-4 text-center">
+        {/* Google Signup */}
+        <div className="mt-6 text-center">
           <p className="text-gray-500">Or sign up with</p>
-          <div className="flex justify-center mt-2">
-            <GoogleLogin onSuccess={handleGoogleSignup} onError={() => alert("Google signup failed")} />
-          </div>
+          <button
+            onClick={handleGoogleSignup}
+            className="mt-2 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition-colors w-full"
+          >
+            <AiOutlineGoogle /> Sign up with Google
+          </button>
         </div>
       </div>
     </div>

@@ -10,10 +10,13 @@ class Settings(BaseSettings):
     # JWT + DB
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 1 day ✅
+
     DATABASE_URL: str
+    SESSION_SECRET_KEY: str
 
     class Config:
-        env_file = ".env"  # load values from .env
+        env_file = ".env"
 
-settings = Settings()        
+settings = Settings()
+    

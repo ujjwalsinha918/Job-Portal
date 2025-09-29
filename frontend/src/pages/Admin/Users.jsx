@@ -1,33 +1,30 @@
-const dummyUsers = [
-  { id: 1, name: "Alice Johnson", email: "alice@example.com", role: "Job Seeker" },
-  { id: 2, name: "Bob Smith", email: "bob@example.com", role: "Employer" },
-  { id: 3, name: "Charlie Brown", email: "charlie@example.com", role: "Admin" },
+const dummyJobs = [
+  { id: 1, title: "Frontend Developer", company: "Tech Corp", status: "Open" },
+  { id: 2, title: "Backend Developer", company: "CodeWorks", status: "Closed" },
+  { id: 3, title: "UI/UX Designer", company: "DesignHub", status: "Open" },
 ];
 
-export default function Users() {
-    return (
-        <div>
-            <h2 className="text-xl font-bold mb-4">Manage Users</h2>
-      <table className="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border p-2">ID</th>
-            <th className="border p-2">Name</th>
-            <th className="border p-2">Email</th>
-            <th className="border p-2">Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dummyUsers.map((user) => (
-            <tr key={user.id}>
-              <td className="border p-2">{user.id}</td>
-              <td className="border p-2">{user.name}</td>
-              <td className="border p-2">{user.email}</td>
-              <td className="border p-2">{user.role}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-        </div>
-    )
+export default function Jobs() {
+  return (
+    <div>
+      <h2 className="text-xl font-bold mb-4">Manage Jobs</h2>
+      <ul className="space-y-3">
+        {dummyJobs.map((job) => (
+          <li key={job.id} className="p-4 border rounded-lg shadow-sm bg-white">
+            <h3 className="font-semibold">{job.title}</h3>
+            <p className="text-sm text-gray-600">{job.company}</p>
+            <span
+              className={`text-xs px-2 py-1 rounded ${
+                job.status === "Open"
+                  ? "bg-green-200 text-green-800"
+                  : "bg-red-200 text-red-800"
+              }`}
+            >
+              {job.status}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }

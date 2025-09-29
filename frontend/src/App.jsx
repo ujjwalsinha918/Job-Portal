@@ -7,8 +7,6 @@ import Landing from "./pages/Public/Landing";
 import Login from "./pages/Auth/Login";
 import Unauthorized from "./pages/Auth/Unauthorized";
 import Register from "./pages/Auth/Register";
-import JobListings from "./pages/Public/JobListings";   // ✅ fixed: should be plural (JobListings)
-import JobDetails from "./pages/Public/JobDetails";
 import JobSeekerDashboard from "./pages/JobSeeker/Dashboard";  // ✅ fixed: should be JobSeeker/Dashboard
 import Profile from "./pages/JobSeeker/Profile";
 import AppliedJobs from "./pages/JobSeeker/AppliedJobs"; // ✅ fixed: should
@@ -19,6 +17,9 @@ import EmployerDashboard from "./pages/Employer/Dashboard";
 import AdminDashboard from "./pages/Admin/Dashboard";
 import Analytics from "./pages/Admin/Analytics";
 import Approvals from "./pages/Admin/Approvals";
+import LoginRedirect from "./pages/Auth/LoginRedirect";
+import JobListing from "./pages/JobSeeker/JobListing";
+
 
 
 function App() {
@@ -29,21 +30,14 @@ function App() {
 
         {/* Public Landing Page (default route when user visits "/") */}
         <Route path="/" element={<Landing />} />
+        <Route path="/oauth-redirect" element={<LoginRedirect />} />
+
 
         {/* Auth Pages */}
         <Route path="/login" element={<Login />} />
         <Route path="/unauthorized" element={<Unauthorized />} /> 
         <Route path="/register" element={<Register />} />
 
-        {/* Job-related Pages */}
-        {/* Shows list of jobs */}
-        <Route path="/jobs" element={<JobListings />} />  
-        
-        {/* Shows details of a single job 
-            ":id" means it's dynamic → e.g. /jobs/1 or /jobs/23
-            useParams() in JobDetails will give us that id
-        */}
-        <Route path="/jobs/:id" element={<JobDetails />} />  
         
         {/* Role-based Protected Routes */}
         <Route 
@@ -54,6 +48,7 @@ function App() {
             </ProtectedRoute>
           }
           />
+        <Route path="/jobseeker/jobs" element={<JobListing />} />
         <Route path="/jobseeker/profile" element={<Profile />} />
         <Route path="/jobseeker/applied-jobs" element={<AppliedJobs />} />
         <Route path="/employer/post-job" element={<PostJob />} />

@@ -5,6 +5,7 @@ from app.schemas.user import UserCreate, UserLogin
 from app.utils.hash import hash_password, verify_password
 from jose import jwt
 from datetime import datetime, timedelta
+from app.core.security import create_access_token
 
 
 SECRET_KEY = "supersecretkey"  # change to env variable in production
