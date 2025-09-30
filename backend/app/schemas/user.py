@@ -23,3 +23,8 @@ class UserLogin(BaseModel):
 
 class RoleUpdate(BaseModel):
     role: str    
+    
+# Schema for updating a user's profile
+class ProfileUpdate(BaseModel):
+    name: Optional[str] = None
+    skills: Optional[str] = None # Assuming skills is a string field for simplicity    

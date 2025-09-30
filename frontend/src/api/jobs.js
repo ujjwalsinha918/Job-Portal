@@ -66,4 +66,14 @@ export const updateApplicationStatus = async (id, status) => {
   return res.data;
 };
 
+export const getProfile = async () => {
+  const res = await api.get("/profiles/users/me"); // updated path
+  return res.data;
+};
+
+export const updateProfile = async (profileData) => {
+  const res = await api.put("/profiles/users/me", profileData); // updated path
+  return res.data;
+};
+
 export default api;

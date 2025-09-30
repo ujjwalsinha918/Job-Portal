@@ -7,6 +7,8 @@ from starlette.middleware.sessions import SessionMiddleware
 import logging
 import secrets
 import os  # ✅ Add os import
+from app.routes import profiles  # make sure this is the correct import path
+
 
 # Configure logging
 logging.basicConfig(
@@ -50,6 +52,7 @@ app.include_router(auth.router, tags=["auth"])
 app.include_router(job.router, tags=["job"])
 app.include_router(applications.router, tags=["applications"])
 app.include_router(admin.router, tags=["admin"])
+app.include_router(profiles.router, tags=["profiles"])  # ✅ Fixed
 
 @app.get("/")
 def root():

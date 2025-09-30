@@ -1,21 +1,35 @@
-import { useState } from "react";
-import ProtectedRoute from "../../components/ProtectedRoute"; // <-- wrap in ProtectedRoute
+import { useEffect, useState } from "react";
+import { getProfile, updateProfile } from "../../api/jobs"; 
+import ProtectedRoute from "../../components/ProtectedRoute";
 
 function ProfileContent() {
-  const [profile, setProfile] = useState({
-    name: "Ujjwal Sinha",
-    email: "ujjwal@example.com",
-    skills: "React, FastAPI, PostgreSQL",
-  });
+  const [profile, setProfile] = useState({ name: "", email: "", skills: "" });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile();
+        setProfile(data);
+      } catch (err) {
+        console.error("Error fetching profile", err);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Profile Updated:", profile);
-    alert("Profile updated successfully! (Later save to backend)");
+    try {
+      await updateProfile(profile);
+      alert("Profile updated successfully!");
+    } catch (err) {
+      console.error("Error updating profile", err);
+      alert("Failed to update profile");
+    }
   };
 
   return (
