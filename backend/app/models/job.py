@@ -18,8 +18,8 @@ class Job(Base):
     location = Column(String(100), nullable=False)
     employer_id = Column(Integer, ForeignKey("users.id"))
     status = Column(Enum(JobStatus), default=JobStatus.pending)
-    skills = Column(String, nullable=True)  # make sure this exists!
-    email = Column(String, unique=True, index=True)
+    skills = Column(String(255), nullable=True)  # make sure this exists!
+    email = Column(String(100), unique=True, index=True)
     
     # job.employer
     employer = relationship("User", back_populates="jobs")
