@@ -17,7 +17,7 @@ def getprofile(user=Depends(get_current_user)):
         "id": user.id,
         "name": user.name,
         "email": user.email,
-        "skills": user.skills,
+        "skills": getattr(user, "skills", None),
     }
     
 @router.put("/users/me")
@@ -34,4 +34,12 @@ def updateprofile(profile: ProfileUpdate, db: Session = Depends(get_db), user=De
 
     db.commit()
     db.refresh(db_user)
-    return {"message": "Profile updated successfully", "profile": db_user}
+    return {
+        "message": "Profile updated successfully",
+        "profile": {
+            "id": db_user.id,
+            "name": db_user.name,
+            "email": db_user.email,
+            "skills": getattr(db_user, "skills", None),
+        },
+    }
