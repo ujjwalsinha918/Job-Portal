@@ -8,6 +8,7 @@ import logging
 import secrets
 import os  # ✅ Add os import
 from app.routes import profiles  # make sure this is the correct import path
+from app.routes import saved_jobs  # ✅ Import saved_jobs router
 
 
 # Configure logging
@@ -53,6 +54,7 @@ app.include_router(job.router, tags=["job"])
 app.include_router(applications.router, tags=["applications"])
 app.include_router(admin.router, tags=["admin"])
 app.include_router(profiles.router, tags=["profiles"])  # ✅ Fixed
+app.include_router(saved_jobs.router)
 
 @app.get("/")
 def root():

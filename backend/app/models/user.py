@@ -10,7 +10,7 @@ class User(Base):
     email = Column(String(100), nullable=False, unique=True)
     role = Column(String(50), nullable=False)
     hashed_password = Column(String(255), nullable=False)
-    # skills = Column(String(255), nullable=True)
+    skills = Column(String(255), nullable=True)
 
     # This line establishes a one-to-many relationship.
     # It means a single User (an employer) can have multiple Job posts.
@@ -22,3 +22,5 @@ class User(Base):
     # `applications` is a new attribute on the User object that will return a list
     # of all `Application` objects submitted by this user.
     applications = relationship("Application", back_populates="jobSeeker")
+    saved_jobs = relationship("SavedJob", back_populates="user", cascade="all, delete")
+

@@ -17,8 +17,8 @@ def create_user(db: Session, user_in: UserCreate, role: str = "jobseeker"):
     - returns the created User ORM object.
     """
     hashed_password = hash_password(user_in.password)
-
-    db_user = User(email=user_in.email, name=user_in.name, hashed_password=hashed_password, role=role)
+    # default empty string if not provided
+    db_user = User(email=user_in.email, name=user_in.name, hashed_password=hashed_password, role=role, skills=getattr(user_in, "skills", ""))
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

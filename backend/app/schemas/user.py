@@ -9,10 +9,12 @@ class UserBase(BaseModel):
 # Schema for registering a new user
 class UserCreate(UserBase):
     password: str # Raw password (will be hashed before storing)
+    skills: Optional[str] = None
 
 # Schema for user login
 class UserResponse(UserBase):
     id: int # new User
+    skills: Optional[str] = None  # Add this line
 
     class Config:
         orm_mode = True # allows SQLAlchemy objects → Pydantic

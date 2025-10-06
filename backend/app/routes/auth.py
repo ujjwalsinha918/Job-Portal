@@ -78,13 +78,13 @@ async def auth_google_callback(request: Request, db: Session = Depends(get_db)):
     error = request.query_params.get("error")
 
     if error:
-        # logger.error(f"OAuth error: {error}")
+        logger.error(f"OAuth error: {error}")
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}?error=oauth_error", status_code=302
         )
 
     if not code:
-        # logger.error("No authorization code received")
+        logger.error("No authorization code received")
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}?error=no_code", status_code=302
         )
@@ -109,7 +109,7 @@ async def auth_google_callback(request: Request, db: Session = Depends(get_db)):
             )
 
             if token_response.status_code != 200:
-                # logger.error(f"Token exchange failed: {token_response.text}")
+                logger.error(f"Token exchange failed: {token_response.text}")
                 return RedirectResponse(
                     url=f"{settings.FRONTEND_URL}?error=token_failed", status_code=302
                 )
@@ -124,7 +124,7 @@ async def auth_google_callback(request: Request, db: Session = Depends(get_db)):
             )
 
             if user_response.status_code != 200:
-                # logger.error("Failed to get user info")
+                logger.error("Failed to get user info")
                 return RedirectResponse(
                     url=f"{settings.FRONTEND_URL}?error=user_info_failed",
                     status_code=302,
@@ -133,6 +133,7 @@ async def auth_google_callback(request: Request, db: Session = Depends(get_db)):
             user_info = user_response.json()
 
     except Exception as e:
+        logger.exception("Database/JWT error during OAuth callback")
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}?error=processing_failed", status_code=302
         )
@@ -164,13 +165,13 @@ async def auth_google_callback(request: Request, db: Session = Depends(get_db)):
                 data={"sub": user.email, "role": user.role}
             )
         else:
-            # logger.info(f"Found existing user with ID: {user.id}")
+            logger.info(f"Found existing user with ID: {user.id}")
             pass
             # Create JWT token for authentication
             jwt_access_token = security.create_access_token(
                 data={"sub": user.email, "role": user.role}
             )
-        # logger.info("JWT token created successfully")
+        logger.info("JWT token created successfully")
 
         # build redirect url
         # After successful OAuth, redirect all users through /oauth-redirect
@@ -201,11 +202,11 @@ async def auth_google_callback(request: Request, db: Session = Depends(get_db)):
         if "oauth_state" in request.session:
             del request.session["oauth_state"]
 
-        # logger.info("OAuth login completed successfully - user authenticated")
+        logger.info("OAuth login completed successfully - user authenticated")
         return response
 
     except Exception as e:
-        # logger.error(f"Database/JWT error: {e}", exc_info=True)
+        logger.error(f"Database/JWT error: {e}", exc_info=True)
         return RedirectResponse(
             url=f"{settings.FRONTEND_URL}?error=login_processing_failed",
             status_code=302,
@@ -285,7 +286,7 @@ async def get_current_user(request: Request, db: Session = Depends(get_db)):
             "authenticated": True,
         }
     except Exception as e:
-        # logger.error(f"Token verification failed: {e}")
+        logger.error(f"Token verification failed: {e}")
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
@@ -306,29 +307,29 @@ def set_role(role_update: RoleUpdate, request: Request, db: Session = Depends(ge
         raise HTTPException(status_code=400, detail="Invalid role")
 
         # Debug logging
-    # logger.info("=== SET ROLE DEBUG ===")
-    # logger.info(f"Cookies received: {dict(request.cookies)}")
-    # logger.info(f"Authorization header: {request.headers.get('authorization', 'None')}")
+    logger.info("=== SET ROLE DEBUG ===")
+    logger.info(f"Cookies received: {dict(request.cookies)}")
+    logger.info(f"Authorization header: {request.headers.get('authorization', 'None')}")
 
     # Get user from token in cookie/header
     token = request.cookies.get("access_token")
 
     if not token:
-        # logger.info("No cookie token, checking Authorization header...")
+        logger.info("No cookie token, checking Authorization header...")
         # Try Authorization header for email registration
         auth_header = request.headers.get("authorization")
         if auth_header and auth_header.startswith("Bearer "):
             token = auth_header.split(" ")[1]
 
     if not token:
-        # logger.error("No token found in cookies or Authorization header")
+        logger.error("No token found in cookies or Authorization header")
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     logger.info(f"Token found: {token[:20]}...")
     try:
         payload = security.decode_access_token(token)
         email = payload.get("sub")
-        # logger.info(f"Token verified for email: {email}")
+        logger.info(f"Token verified for email: {email}")
         user = user_crud.get_user_by_email(db, email=email)
         if not user:
             logger.error(f"User not found for email: {email}")
@@ -339,8 +340,8 @@ def set_role(role_update: RoleUpdate, request: Request, db: Session = Depends(ge
         db.add(user)
         db.commit()
         db.refresh(user)
-        # logger.info(f"Role updated for user {email}: {role_update.role}")
+        logger.info(f"Role updated for user {email}: {role_update.role}")
         return {"message": "Role uploaded", "role": user.role}
     except Exception as e:
-        # logger.error(f"Role update failed: {e}")
+        logger.error(f"Role update failed: {e}")
         raise HTTPException(status_code=401, detail="Invalid token")
