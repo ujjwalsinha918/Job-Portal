@@ -11,7 +11,6 @@ class User(Base):
     role = Column(String(50), nullable=False)
     hashed_password = Column(String(255), nullable=False)
     skills = Column(String(255), nullable=True)
-    resume = Column(String(255), nullable=True)
 
     # This line establishes a one-to-many relationship.
     # It means a single User (an employer) can have multiple Job posts.
