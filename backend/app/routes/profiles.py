@@ -1,13 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import UploadFile, File, Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.user import User
 from app.schemas.user import ProfileUpdate
 from app.utils.auth import get_current_user
 from app.models.user import User
+from fastapi.responses import FileResponse
+
 
 
 router = APIRouter(prefix="/profiles", tags=["Profiles"])
+UPLOAD_DIR = "uploads/resumes"
 
 @router.get("/users/me")
 def getprofile(user=Depends(get_current_user)):
@@ -43,3 +46,27 @@ def updateprofile(profile: ProfileUpdate, db: Session = Depends(get_db), user=De
             "skills": getattr(db_user, "skills", None),
         },
     }
+    
+    
+@router.post("/upload-resume")
+async def upload_resume(file: UploadFile = File(...), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Validate file type
+    if not file.filename.endswith((".pdf", ".doc", ".docx")):
+        return JSONResponse(status_code=400, content={"detail": "Invalid file type."})
+    
+    # Save file locally
+    file_path = os.path.join(UPLOAD_DIR, f"user_{current_user.id}_{file.filename}")
+    with open(file_path, "wb") as f:
+        f.write(await file.read())
+    
+    # Save path in DB
+    current_user.resume = file_path
+    db.commit()
+    
+    return {"detail": "Resume uploaded successfully!", "resume_path": file_path}
+
+@router.get("/my-resume")
+def get_resume(current_user: User = Depends(get_current_user)):
+    if not current_user.resume or not os.path.exists(current_user.resume):
+        return JSONResponse(status_code=404, content={"detail": "Resume not found."})
+    return FileResponse(current_user.resume, filename="resume.pdf")

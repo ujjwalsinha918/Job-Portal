@@ -15,6 +15,7 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     id: int # new User
     skills: Optional[str] = None  # Add this line
+    resume: Optional[str] = None
 
     class Config:
         orm_mode = True # allows SQLAlchemy objects → Pydantic
@@ -29,4 +30,5 @@ class RoleUpdate(BaseModel):
 # Schema for updating a user's profile
 class ProfileUpdate(BaseModel):
     name: Optional[str] = None
-    skills: Optional[str] = None # Assuming skills is a string field for simplicity    
+    skills: Optional[str] = None 
+    resume: Optional[str] = None   
