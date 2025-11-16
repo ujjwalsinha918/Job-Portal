@@ -76,4 +76,35 @@ export const updateProfile = async (profileData) => {
   return res.data;
 };
 
+// Save a job
+export const saveJob = async (jobId) => {
+  const res = await api.post(`/saved-jobs/${jobId}`);
+  return res.data;
+};
+
+// Unsave a job
+export const unsaveJob = async (jobId) => {
+  const res = await api.delete(`/saved-jobs/${jobId}`);
+  return res.data;
+};
+
+// Get all saved jobs for the logged-in user
+export const getSavedJobs = async () => {
+  const res = await api.get("/saved-jobs/");
+  return res.data;
+};
+
+export const uploadResume = async (formData) => {
+  const res = await api.post("/profiles/upload-resume", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
+};
+
+export const downloadResume = async () => {
+  const res = await api.get("/profiles/my-resume", { responseType: "blob" });
+  return res.data;
+};
+
+
 export default api;

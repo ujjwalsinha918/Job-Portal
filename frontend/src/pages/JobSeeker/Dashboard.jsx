@@ -4,13 +4,15 @@ import SidebarMenu from "../../components/ModernSidebar";
 import JobListing from "./JobListing";
 import Profile from "./Profile";
 import AppliedJobs from "./AppliedJobs";
-import ProtectedRoute from "../../components/ProtectedRoute"; // <-- import it
+import ProtectedRoute from "../../components/ProtectedRoute";
+import SavedJobs from "./SavedJobs";
 
 export default function JobSeekerDashboard() {
   const jobSeekerMenu = [
     { label: "Profile", path: "/jobseeker/profile" },
     { label: "Browse Jobs", path: "/jobseeker/jobs" },
     { label: "Applied Jobs", path: "/jobseeker/applied-jobs" },
+    { label: "Saved Jobs", path: "/jobseeker/saved-jobs" }, // ✅ corrected path casing
     {
       label: "Charts",
       submenu: [
@@ -48,6 +50,14 @@ export default function JobSeekerDashboard() {
               element={
                 <ProtectedRoute role="jobseeker">
                   <JobListing />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="saved-jobs"
+              element={
+                <ProtectedRoute role="jobseeker">
+                  <SavedJobs />
                 </ProtectedRoute>
               }
             />

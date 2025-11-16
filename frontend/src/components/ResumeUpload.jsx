@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { uploadResume } from "../api/jobs"; // import the new function
+// import { Upload, FileText, CheckCircle, XCircle, Trash2, Eye } from "lucide-react"; //updated
 
-export default function ResumeUpload() {
+
+export default function ResumeUpload( ) {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
+  
 
   const handleUpload = async () => {
     if (!file) return;
