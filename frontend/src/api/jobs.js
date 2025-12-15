@@ -95,10 +95,32 @@ export const getSavedJobs = async () => {
 };
 
 export const uploadResume = async (formData) => {
-  const res = await api.post("/profiles/upload-resume", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-  return res.data;
+  
+console.log("🌐 API Layer: uploadResume called");
+  console.log("FormData received:", formData);
+  console.log("FormData entries:");
+  for (let pair of formData.entries()) {
+    console.log(`  ${pair[0]}:`, pair[1]);
+  }
+  
+  try {
+    console.log("📡 Making POST request to /profiles/upload-resume");
+    
+    const res = await api.post("/profiles/upload-resume", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    
+    console.log("✅ API request successful");
+    console.log("Response status:", res.status);
+    console.log("Response data:", res.data);
+    
+    return res.data;
+  } catch (error) {
+    console.error("❌ API request failed");
+    console.error("Error in uploadResume:", error);
+    console.error("Error response:", error.response);
+    throw error;
+  }
 };
 
 export const downloadResume = async () => {

@@ -12,24 +12,32 @@ function ProfileContent() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const data = await getProfile();
-        setProfile({
-          name: data.name || "",
-          email: data.email || "",
-          skills: data.skills || "",
-          resume: data.resume || null, // <-- fetch resume info
-        });
-      } catch (err) {
-        console.error("Error fetching profile", err);
-        setError("Failed to load profile");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, []);
+  const fetchProfile = async () => {
+    console.log("🔄 Fetching profile from server...");
+    try {
+      const data = await getProfile();
+      console.log("✅ Profile data received from server:", data);
+      console.log("Resume value from server:", data.resume);
+      console.log("Resume type:", typeof data.resume);
+      
+      setProfile({
+        name: data.name || "",
+        email: data.email || "",
+        skills: data.skills || "",
+        resume: data.resume || null,
+      });
+      
+      console.log("📝 Profile state set. resume value:", data.resume || null);
+    } catch (err) {
+      console.error("❌ Error fetching profile:", err);
+      setError("Failed to load profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchProfile();
+  console.log("📌 resumeFile state changed to:", resumeFile);
+}, [resumeFile]);
 
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -38,14 +46,16 @@ function ProfileContent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
+    console.log("💾 Saving profile changes...");
     try {
       await updateProfile({
         name: profile.name,
         skills: profile.skills
       });
+      console.log("✅ Profile updated successfully");
       alert("Profile updated successfully!");
     } catch (err) {
-      console.error("Error updating profile", err);
+      console.error("❌ Error updating profile:", err);
       alert("Failed to update profile: " + (err.response?.data?.detail || "Unknown error"));
     } finally {
       setSaving(false);
@@ -53,40 +63,105 @@ function ProfileContent() {
   };
 
   const handleResumeChange = (e) => {
-    setResumeFile(e.target.files[0]);
-    setUploadMessage("");
+console.log("🎯 handleResumeChange TRIGGERED");
+  console.log("Event object:", e);
+  console.log("Files array:", e.target.files);
+  
+  const file = e.target.files[0];
+  console.log("📄 Resume file selected:", file ? file.name : "none");
+  console.log("File object details:", file);
+  
+  setResumeFile(file);
+  console.log("✅ setResumeFile called with:", file);
+  
+  setUploadMessage("");
   };
 
   const handleResumeUpload = async () => {
-    if (!resumeFile) return alert("Please select a file first.");
+    if (!resumeFile) {
+      console.warn("⚠️ No file selected for upload");
+      return alert("Please select a file first.");
+    }
+    
+    console.log("📤 Step 1: File selected");
+    console.log("File details:", {
+      name: resumeFile.name,
+      size: resumeFile.size,
+      type: resumeFile.type
+    });
+
     const formData = new FormData();
     formData.append("file", resumeFile);
+    console.log("📦 Step 2: FormData created");
 
     try {
+      console.log("🔄 Step 3: Calling uploadResume API...");
+      console.log("API endpoint: /profiles/upload-resume");
       const res = await uploadResume(formData);
+      console.log("✅ Step 4: API response received");
+      console.log("Full response object:", res);
+      console.log("Response detail:", res.detail);
+      console.log("Response resume value:", res.resume);
+      
+      console.log("📝 Step 5: Updating profile state");
+      console.log("Previous profile.resume:", profile.resume);
+      // Update profile state to show resume is now available
+      setProfile(prev => {
+        const updated = { ...prev, resume: true };
+        console.log("📝 Updated profile state after upload:", updated);
+        return updated;
+      });
+      
       setUploadMessage(res.detail || "Resume uploaded successfully!");
       setResumeFile(null);
-      // <-- Update state without page reload
-    setProfile(prev => ({ ...prev, resume: true }));
-    setUploadMessage("Resume uploaded successfully!");
+      
+      console.log("✅ Step 6: Upload complete - State updated");
+      console.log("=== UPLOAD PROCESS COMPLETED ===");
+      
+      // Clear the file input
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) fileInput.value = "";
+      
     } catch (err) {
+      console.error("❌ UPLOAD FAILED");
+    console.error("Error object:", err);
+    console.error("Error response:", err.response);
+    console.error("Error response data:", err.response?.data);
+    console.error("Error message:", err.message);
+    console.error("=== UPLOAD PROCESS FAILED ===");
       setUploadMessage(err.response?.data?.detail || "Failed to upload resume");
     }
   };
-
-  // --- NEW: Download resume
   const handleResumeDownload = async () => {
+    console.log("📥 Starting resume download...");
+    console.log("Current profile.resume value:", profile.resume);
+    
     try {
+      console.log("🔄 Fetching resume from server...");
       const blob = await downloadResume();
+      console.log("✅ Resume blob received:", {
+        size: blob.size,
+        type: blob.type
+      });
+      
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "resume.pdf"); // can also detect original filename
+      link.setAttribute("download", "resume.pdf");
       document.body.appendChild(link);
+      
+      console.log("🖱️ Triggering download...");
       link.click();
+      
+      // Cleanup
       link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      console.log("✅ Resume download complete");
     } catch (err) {
-      alert("Failed to download resume");
+      console.error("❌ Resume download failed:", err);
+      console.error("Error details:", err.response?.data);
+      alert("Failed to download resume: " + (err.response?.data?.detail || "Unknown error"));
     }
   };
 
@@ -113,6 +188,8 @@ function ProfileContent() {
       </div>
     );
   }
+
+  console.log("🎨 Rendering profile. Current resume status:", profile.resume);
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
@@ -210,28 +287,73 @@ function ProfileContent() {
         </form>
 
         {/* Resume Section */}
-        <div className="space-y-2">
-          <h2 className="font-semibold">Resume</h2>
-          <input type="file" onChange={handleResumeChange} />
-          <div className="flex items-center space-x-4 mt-2">
-            <button
-              type="button"
-              onClick={handleResumeUpload}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-            >
-              Upload Resume
-            </button>
-            {profile.resume && (
+        <div className="border-t pt-6 space-y-4">
+          <h2 className="text-xl font-semibold text-gray-900">Resume Management</h2>
+          
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Upload New Resume
+              </label>
+              <input 
+                type="file" 
+                onChange={handleResumeChange}
+                accept=".pdf,.doc,.docx"
+                id="resume-file-input"
+                className="block w-full text-sm text-gray-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-lg file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-blue-50 file:text-blue-700
+                  hover:file:bg-blue-100
+                  cursor-pointer"
+              />
+              {/* ADD THIS LINE to show selected file */}
+    <p className="mt-2 text-xs text-gray-600">
+      {resumeFile ? `Selected: ${resumeFile.name}` : "No file selected"}
+    </p>
+            </div>
+            
+            <div className="flex items-center space-x-4">
               <button
                 type="button"
-                onClick={handleResumeDownload}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                onClick={handleResumeUpload}
+                disabled={!resumeFile}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                <Download size={16} className="mr-2" /> View / Download Resume
+                Upload Resume
               </button>
+              
+              {profile.resume && (
+                <button
+                  type="button"
+                  onClick={handleResumeDownload}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Download size={16} />
+                  <span>Download Resume</span>
+                </button>
+              )}
+            </div>
+            
+            {uploadMessage && (
+              <div className={`p-3 rounded-lg ${
+                uploadMessage.includes("success") 
+                  ? "bg-green-50 text-green-800 border border-green-200" 
+                  : "bg-red-50 text-red-800 border border-red-200"
+              }`}>
+                {uploadMessage}
+              </div>
+            )}
+            
+            {profile.resume && (
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  ✓ Resume is uploaded and available for download
+                </p>
+              </div>
             )}
           </div>
-          {uploadMessage && <p className="text-sm text-gray-600">{uploadMessage}</p>}
         </div>
       </div>
     </div>
